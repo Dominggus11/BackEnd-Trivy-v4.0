@@ -1,9 +1,7 @@
 package controllers
 
 import (
-	"fmt"
 	"io"
-	"mime/multipart"
 	"net/http"
 	"os"
 	"trivy_v3/models"
@@ -11,13 +9,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
-type BindFile struct {
-	File      *multipart.FileHeader `form:"file"`
-	Pathfile  string                `form:"pathfile"`
-	PathJson  string                `form:"pathjson"`
-	ProjectID int                   `form:"projectid"`
-}
 
 func FindDockers(c *gin.Context) {
 	var dockerfiles []models.Dockerfiles
@@ -28,11 +19,8 @@ func FindDockers(c *gin.Context) {
 
 func PostDockerfile(c *gin.Context) {
 	db := models.DB
-	router := gin.Default()
-	router.MaxMultipartMemory = 8 << 20
-	var bindFile BindFile
-	// var input models.Dockerfiles
-	if err := c.ShouldBind(&bindFile); err != nil {
+	var input models.Dockerfiles
+	if err := c.ShouldBind(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
@@ -40,10 +28,10 @@ func PostDockerfile(c *gin.Context) {
 	}
 	pathFile := trivy.MkdirUploadFile()
 	pathJson := trivy.MkdirUploadJson()
-	file, err := c.FormFile("file")
+	file, err := c.FormFile("pathfile")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
+			"message": "No file is received",
 		})
 		return
 	}
@@ -52,18 +40,18 @@ func PostDockerfile(c *gin.Context) {
 	dockerfile := models.Dockerfiles{
 		Pathfile:  pathFile,
 		PathJson:  pathJson,
-		ProjectID: bindFile.ProjectID,
+		ProjectID: input.ProjectID,
 	}
-	fmt.Println(bindFile.ProjectID)
+
 	var project models.Projects
-	if err := db.Where("id = ?", bindFile.ProjectID).First(&project).Error; err != nil {
+	if err := db.Where("id = ?", input.ProjectID).First(&project).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Project Tidak Tersedia !!!"})
 		return
 	}
 
-	bindFile.Pathfile = file.Filename
+	input.Pathfile = file.Filename
 	c.SaveUploadedFile(file, pathFile+"/"+file.Filename)
-	trivy.TrivyScan(pathJson, pathFile, bindFile.Pathfile)
+	trivy.TrivyScan(pathJson, pathFile, input.Pathfile)
 
 	models.DB.Create(&dockerfile)
 
@@ -71,7 +59,6 @@ func PostDockerfile(c *gin.Context) {
 		"data": dockerfile,
 	})
 }
-
 func FindDocker(c *gin.Context) {
 	db := models.DB
 	// Get model if exist

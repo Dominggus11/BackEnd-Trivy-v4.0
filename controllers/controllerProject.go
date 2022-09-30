@@ -36,6 +36,7 @@ func PostProject(c *gin.Context) {
 	if err := db.Where("project_name = ?", input.ProjectName).First(&input).Error; err != nil {
 		project := models.Projects{
 			ProjectName: input.ProjectName,
+			Description: input.Description,
 		}
 		db.Create(&project)
 		c.JSON(http.StatusOK, gin.H{
@@ -78,6 +79,7 @@ func UpdateProject(c *gin.Context) {
 	if err != nil {
 		project := models.Projects{
 			ProjectName: temp.ProjectName,
+			Description: input.Description,
 		}
 		db.Model(&input).Updates(project)
 		c.JSON(http.StatusOK, gin.H{

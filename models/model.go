@@ -9,6 +9,7 @@ import (
 type Projects struct {
 	ID          uint
 	ProjectName string `json:"projectname"`
+	Description string `json:"description"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

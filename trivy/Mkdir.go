@@ -10,7 +10,7 @@ import (
 func MkdirUploadFile() string {
 	folder := 1
 	pathFolder := "FileDocker/FileUpload/"
-	for i := 1; i < 10; i++ {
+	for i := 1; i < 100; i++ {
 		_, err := os.Stat(pathFolder + strconv.Itoa(folder))
 		if err == nil {
 			folder = folder + 1
@@ -28,7 +28,7 @@ func MkdirUploadFile() string {
 func MkdirWriteFile() string {
 	folder := 1
 	pathFolder := "FileDocker/FileWrite/"
-	for i := 1; i < 10; i++ {
+	for i := 1; i < 100; i++ {
 		_, err := os.Stat(pathFolder + strconv.Itoa(folder))
 		if err == nil {
 			folder = folder + 1
@@ -75,3 +75,5 @@ func MkdirUploadJson() string {
 	}
 	return pathFolder + strconv.Itoa(folder)
 }
+
+// trivy config -f json -o /home/roy/BackEnd-Trivy-v4.0/FileJson/FileUpload/1/resultsImage.json

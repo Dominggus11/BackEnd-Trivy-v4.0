@@ -50,8 +50,12 @@ func PostDockerfile(c *gin.Context) {
 	}
 
 	input.Pathfile = file.Filename
+	//fmt.Println(pathFile)
 	c.SaveUploadedFile(file, pathFile+"/"+file.Filename)
+	// time.Sleep(8 * time.Second)
 	trivy.TrivyScan(pathJson, pathFile, input.Pathfile)
+	// fmt.Println(input.Pathfile)
+	// fmt.Println(pathFile)
 
 	models.DB.Create(&dockerfile)
 

@@ -79,7 +79,7 @@ func UpdateProject(c *gin.Context) {
 	if err != nil {
 		project := models.Projects{
 			ProjectName: temp.ProjectName,
-			Description: input.Description,
+			Description: temp.Description,
 		}
 		db.Model(&input).Updates(project)
 		c.JSON(http.StatusOK, gin.H{
